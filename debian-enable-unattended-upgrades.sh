@@ -21,5 +21,5 @@ fi
 echo unattended-upgrades unattended-upgrades/enable_auto_updates boolean true | debconf-set-selections
 dpkg-reconfigure -f noninteractive unattended-upgrades
 
-# Manully run unattended upgrades once
-unattended-upgrade -d
+# Manually run unattended upgrades once
+apt-get update && unattended-upgrade -d
