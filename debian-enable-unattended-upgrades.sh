@@ -2,7 +2,7 @@
 
 STDIN=$(cat -)
 
-apt-get install unattended-upgrades apt-listchanges
+apt-get --yes install unattended-upgrades apt-listchanges
 
 #EMAIL_ADDRESS=test@example.org
 EMAIL_ADDRESS=$STDIN
