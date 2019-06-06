@@ -4,7 +4,7 @@
 STDIN=$(cat -)
 
 # Install prerequisites
-apt-get --yes install unattended-upgrades apt-listchanges
+apt-get --yes install unattended-upgrades apt-listchanges curl
 
 #EMAIL_ADDRESS=test@example.org
 
