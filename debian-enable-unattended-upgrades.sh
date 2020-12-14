@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set +e
+
 # Get target email address from STDIN
 STDIN=$(cat -)
 
