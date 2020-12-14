@@ -3,6 +3,9 @@
 # Get target email address from STDIN
 STDIN=$(cat -)
 
+# File to place custom configuration parameters into
+CUSTOM_CONFIG_FILE=/etc/apt/apt.conf.d/80custom
+
 # Install prerequisites
 apt-get --yes install unattended-upgrades apt-listchanges
 
@@ -11,9 +14,9 @@ apt-get --yes install unattended-upgrades apt-listchanges
 # Configure email address
 EMAIL_ADDRESS=$STDIN
 if [ ! -z ${EMAIL_ADDRESS} ]; then
-  cat /etc/apt/apt.conf.d/50unattended-upgrades | grep ${EMAIL_ADDRESS}
+  cat ${CUSTOM_CONFIG_FILE} | grep ${EMAIL_ADDRESS}
   if [ $? -gt 0 ]; then
-    printf "\nUnattended-Upgrade::Mail \"${EMAIL_ADDRESS}\";\n" >> /etc/apt/apt.conf.d/50unattended-upgrades
+    printf "\nUnattended-Upgrade::Mail \"${EMAIL_ADDRESS}\";\n" >> ${CUSTOM_CONFIG_FILE}
   fi
 fi
 
