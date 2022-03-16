@@ -6,6 +6,9 @@
 #
 # Configuration:
 #
+#   # Optionally configure schedule. Default is `7,16:00`.
+#   export TIMER_CALENDAR=04:00
+#
 #   # Optionally configure email notifications.
 #   export EMAIL_ADDRESS=test@example.org
 #
@@ -81,6 +84,40 @@ function configure_email {
 }
 
 
+function configure_schedule {
+
+  # Reconfigure unattended-upgrade schedule.
+
+  mkdir -p /etc/systemd/system/apt-daily-upgrade.timer.d
+  cat << EOF > /etc/systemd/system/apt-daily-upgrade.timer.d/override.conf
+[Timer]
+OnCalendar=
+OnCalendar=*-*-* ${TIMER_CALENDAR:-7,16:00}
+RandomizedDelaySec=15m
+EOF
+
+  mkdir -p /etc/systemd/system/apt-daily-upgrade.service.d
+  cat << EOF > /etc/systemd/system/apt-daily-upgrade.service.d/override.conf
+[Unit]
+After=
+
+[Service]
+ExecStart=
+ExecStart=/usr/lib/apt/apt.systemd.daily
+EOF
+
+  # Turn off apt-daily.timer altogether
+  systemctl stop apt-daily.timer
+  systemctl disable apt-daily.timer
+
+  # Reload systemd configuration.
+  systemctl daemon-reload
+
+  # Display timer schedule.
+  # systemctl list-timers
+}
+
+
 function oneshot {
   # Manually run unattended upgrades once.
   apt-get update && unattended-upgrade -d
@@ -91,6 +128,7 @@ function main {
   setup_unattended
   configure_unattended
   configure_email
+  configure_schedule
   oneshot
 }
 
