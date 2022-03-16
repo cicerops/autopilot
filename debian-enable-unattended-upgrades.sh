@@ -2,19 +2,20 @@
 #
 # About:
 #
-#   Wash & go setup and configuration program for Debian Unattended Upgrades.
+#   Setup and configuration program for Debian Unattended Upgrades.
 #
 # Configuration:
 #
-#   # Optionally configure schedule. Default is `7,16:00`.
-#   export TIMER_CALENDAR=04:00
+#   # Optionally configure update schedule. Default is `7,16:00`.
+#   export UNATTENDED_PACKAGE_TIME=21:00
+#
 #
 #   # Optionally configure email notifications.
-#   export EMAIL_ADDRESS=test@example.org
+#   export UNATTENDED_EMAIL_ADDRESS=test@example.org
 #
 # Usage:
 #
-#   bash <(curl -s https://gist.githubusercontent.com/amotl/5097e39b065ec495e42ec6982c99f930/raw/debian-enable-unattended-upgrades.sh)
+#   bash <(curl -s https://raw.githubusercontent.com/cicerops/autopilot/main/debian-enable-unattended-upgrades.sh)
 #
 # License:
 #
@@ -74,8 +75,8 @@ EOF
 
 function configure_email {
   # Configure email address.
-  if [ ! -z "${EMAIL_ADDRESS}" ]; then
-    apt-config dump | grep "${EMAIL_ADDRESS}"
+  if [ ! -z "${UNATTENDED_EMAIL_ADDRESS}" ]; then
+    apt-config dump | grep "${UNATTENDED_EMAIL_ADDRESS}"
     if [ $? -gt 0 ]; then
       printf "\n// Email address for notifying on any actions.\n" >> "${CUSTOM_CONFIG_FILE}"
       printf "Unattended-Upgrade::Mail \"${EMAIL_ADDRESS}\";\n" >> "${CUSTOM_CONFIG_FILE}"
@@ -92,7 +93,7 @@ function configure_schedule {
   cat << EOF > /etc/systemd/system/apt-daily-upgrade.timer.d/override.conf
 [Timer]
 OnCalendar=
-OnCalendar=*-*-* ${TIMER_CALENDAR:-7,16:00}
+OnCalendar=*-*-* ${UNATTENDED_PACKAGE_TIME:-7,16:00}
 RandomizedDelaySec=15m
 EOF
 
@@ -131,5 +132,6 @@ function main {
   configure_schedule
   oneshot
 }
+
 
 main
