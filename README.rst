@@ -22,6 +22,9 @@ Setup::
     # Initial system configuration.
     bash <(curl -s https://raw.githubusercontent.com/cicerops/autopilot/main/debian-bootstrap.sh)
 
+    # Enable automatic reboots. Default is `false`.
+    export UNATTENDED_REBOOT_ENABLE=true
+
     # Enable unattended package updates.
     bash <(curl -s https://raw.githubusercontent.com/cicerops/autopilot/main/debian-enable-unattended-upgrades.sh)
 
