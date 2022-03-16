@@ -17,6 +17,7 @@
 #
 # Usage:
 #
+#   apt-get update && apt-get install --yes bash curl
 #   bash <(curl -s https://raw.githubusercontent.com/cicerops/autopilot/main/debian-enable-unattended-upgrades.sh)
 #
 # License:
