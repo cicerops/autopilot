@@ -9,6 +9,8 @@
 #   # Optionally configure update schedule. Default is `7,16:00`.
 #   export UNATTENDED_PACKAGE_TIME=21:00
 #
+#   # Optionally configure reboot time. Default is `04:00`.
+#   export UNATTENDED_REBOOT_TIME=22:00
 #
 #   # Optionally configure email notifications.
 #   export UNATTENDED_EMAIL_ADDRESS=test@example.org
@@ -119,6 +121,23 @@ EOF
 }
 
 
+function configure_reboot {
+  apt-config dump | grep "Unattended-Upgrade::Automatic-Reboot"
+  if [ $? -gt 0 ]; then
+    cat << EOF >> "${CUSTOM_CONFIG_FILE}"
+// Automatically reboot *WITHOUT CONFIRMATION* if the file `/var/run/reboot-required` is found after the upgrade.
+Unattended-Upgrade::Automatic-Reboot "true";
+
+// If automatic reboot is enabled and needed, reboot at the specific time.
+Unattended-Upgrade::Automatic-Reboot-Time "${UNATTENDED_REBOOT_TIME:-04:00}";
+
+// When set to `true`, automatically reboot even if there are users currently logged in.
+Unattended-Upgrade::Automatic-Reboot-WithUsers "false";
+EOF
+  fi
+}
+
+
 function oneshot {
   # Manually run unattended upgrades once.
   apt-get update && unattended-upgrade -d
@@ -130,6 +149,7 @@ function main {
   configure_unattended
   configure_email
   configure_schedule
+  configure_reboot
   oneshot
 }
 
