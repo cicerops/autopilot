@@ -43,6 +43,32 @@ function setup_unattended {
 }
 
 
+function configure_unattended {
+
+  # Enable automatic package upgrades.
+  apt-config dump | grep "APT::Periodic::Unattended-Upgrade"
+  if [ $? -gt 0 ]; then
+    cat << EOF >> "${AUTOUPGRADE_CONFIG_FILE}"
+APT::Periodic::Update-Package-Lists "1";
+APT::Periodic::Unattended-Upgrade "1";
+EOF
+  fi
+
+  # Reconfigure the minimal interval between runs, expressed in days, to "not
+  # limited". That means, always perform the requested action, regardless of the
+  # time that has passed since the last time. With apt versions above 1.5
+  # (Debian 10 buster) you can change the APT::Periodic values from "1" to "always".
+  apt_version=$(dpkg-query -f='${Version}\n' --show apt)
+  if $(dpkg --compare-versions "$apt_version" "lt" "1.5"); then
+    return
+  fi
+  sed -i 's|APT::Periodic::Update-Package-Lists "1";|APT::Periodic::Update-Package-Lists "always";|g' "${AUTOUPGRADE_CONFIG_FILE}"
+  sed -i 's|APT::Periodic::Unattended-Upgrade "1";|APT::Periodic::Unattended-Upgrade "always";|g' "${AUTOUPGRADE_CONFIG_FILE}"
+  return
+
+}
+
+
 function configure_email {
   # Configure email address.
   if [ ! -z "${EMAIL_ADDRESS}" ]; then
@@ -63,6 +89,7 @@ function oneshot {
 
 function main {
   setup_unattended
+  configure_unattended
   configure_email
   oneshot
 }
