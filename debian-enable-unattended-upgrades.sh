@@ -82,7 +82,7 @@ function configure_email {
     apt-config dump | grep "${UNATTENDED_EMAIL_ADDRESS}"
     if [ $? -gt 0 ]; then
       printf "\n// Email address for notifying on any actions.\n" >> "${CUSTOM_CONFIG_FILE}"
-      printf "Unattended-Upgrade::Mail \"${EMAIL_ADDRESS}\";\n" >> "${CUSTOM_CONFIG_FILE}"
+      printf "Unattended-Upgrade::Mail \"${UNATTENDED_EMAIL_ADDRESS}\";\n" >> "${CUSTOM_CONFIG_FILE}"
     fi
   fi
 }
