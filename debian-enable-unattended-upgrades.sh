@@ -21,7 +21,7 @@
 #
 # License:
 #
-#   GNU General Public License, version 3
+#   GNU Affero General Public License, version 3
 #
 # References:
 #
