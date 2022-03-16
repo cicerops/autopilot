@@ -129,6 +129,7 @@ function configure_reboot {
   apt-config dump | grep "Unattended-Upgrade::Automatic-Reboot"
   if [ $? -gt 0 ]; then
     cat << EOF >> "${CUSTOM_CONFIG_FILE}"
+
 // Automatically reboot *WITHOUT CONFIRMATION* if the file `/var/run/reboot-required` is found after the upgrade.
 Unattended-Upgrade::Automatic-Reboot "${UNATTENDED_REBOOT_ENABLE:-false}";
 
