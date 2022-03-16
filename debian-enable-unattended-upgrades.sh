@@ -4,15 +4,15 @@
 #
 #   Setup and configuration program for Debian Unattended Upgrades.
 #
-# Configuration:
+# Configuration (optional):
 #
-#   # Optionally configure update schedule. Default is `7,16:00`.
+#   # Configure update schedule. Default is `7,16:00`.
 #   export UNATTENDED_PACKAGE_TIME=21:00
 #
-#   # Optionally configure reboot time. Default is `04:00`.
+#   # Configure reboot time. Default is `04:00`.
 #   export UNATTENDED_REBOOT_TIME=22:00
 #
-#   # Optionally configure email notifications.
+#   # Configure email notifications. Default is `no emails`.
 #   export UNATTENDED_EMAIL_ADDRESS=test@example.org
 #
 # Usage:
