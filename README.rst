@@ -1,14 +1,33 @@
-###############################
-Tools for autoupdate procedures
-###############################
+##################
+cicerops autopilot
+##################
 
+
+*****
+About
+*****
+
+Just some humble programs to assist in Debian system maintenance.
+
+
+*****
+Usage
+*****
 
 Setup::
 
-    bash <(curl -s https://gist.githubusercontent.com/amotl/5097e39b065ec495e42ec6982c99f930/raw/debian-enable-unattended-upgrades.sh)
+    # Initial system configuration.
+    bash <(curl -s https://raw.githubusercontent.com/cicerops/autopilot/main/debian-bootstrap.sh)
+
+    # Enable unattended package updates.
+    bash <(curl -s https://raw.githubusercontent.com/cicerops/autopilot/main/debian-enable-unattended-upgrades.sh)
 
 
-Testing::
+*******
+Testing
+*******
+::
 
     docker run -it --rm --volume $PWD:/src debian:bullseye bash
+    bash /src/debian-bootstrap.sh
     bash /src/debian-enable-unattended-upgrades.sh
