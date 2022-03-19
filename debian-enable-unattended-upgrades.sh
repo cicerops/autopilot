@@ -189,7 +189,7 @@ function configure_cleanup {
     cat << EOF >> "${CUSTOM_CONFIG_FILE}"
 
 # Remove unused packages from system.
-Unattended-Upgrade::Remove-Unused-Kernel-Packages "true";
+# Unattended-Upgrade::Remove-Unused-Kernel-Packages "true";
 Unattended-Upgrade::Remove-Unused-Dependencies "true";
 
 EOF
