@@ -261,5 +261,11 @@ function main {
   oneshot
 }
 
+function ready {
+  echo
+  echo 'The system has been configured, the output above is from `unattended-upgrade --dry-run --debug`.'
+  echo 'Please run `unattended-upgrade --debug` in order to apply the changes.'
+}
 
 main
+ready
