@@ -183,6 +183,20 @@ EOF
 }
 
 
+function configure_cleanup {
+  apt-config dump | grep "Unattended-Upgrade::Remove-Unused"
+  if [ $? -gt 0 ]; then
+    cat << EOF >> "${CUSTOM_CONFIG_FILE}"
+
+# Remove unused packages from system.
+Unattended-Upgrade::Remove-Unused-Kernel-Packages "true";
+Unattended-Upgrade::Remove-Unused-Dependencies "true";
+
+EOF
+  fi
+}
+
+
 function oneshot {
   # Manually run unattended upgrades once.
   apt-get update && unattended-upgrade --debug
@@ -240,6 +254,7 @@ function main {
   enable_unattended
   configure_email
   configure_reboot
+  configure_cleanup
   enable_unattended_repositories
   configure_schedule
   oneshot
