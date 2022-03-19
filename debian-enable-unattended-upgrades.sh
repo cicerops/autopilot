@@ -190,8 +190,8 @@ function configure_cleanup {
 
 # Remove unused packages from system, using "apt autoremove".
 # Unattended-Upgrade::Remove-Unused-Kernel-Packages "true";
-Unattended-Upgrade::Remove-Unused-Dependencies "true";
-Unattended-Upgrade::Remove-New-Unused-Dependencies "true";
+# Unattended-Upgrade::Remove-Unused-Dependencies "true";
+# Unattended-Upgrade::Remove-New-Unused-Dependencies "true";
 
 EOF
   fi
