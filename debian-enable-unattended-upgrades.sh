@@ -139,8 +139,9 @@ Unattended-Upgrade::Automatic-Reboot "${UNATTENDED_REBOOT_ENABLE:-false}";
 // If automatic reboot is enabled and needed, reboot at the specific time.
 Unattended-Upgrade::Automatic-Reboot-Time "${UNATTENDED_REBOOT_TIME:-04:00}";
 
-// When set to `true`, automatically reboot even if there are users currently logged in.
+// When set to "true", automatically reboot even if there are users currently logged in.
 Unattended-Upgrade::Automatic-Reboot-WithUsers "false";
+
 EOF
   fi
 }
