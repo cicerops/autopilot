@@ -188,9 +188,10 @@ function configure_cleanup {
   if [ $? -gt 0 ]; then
     cat << EOF >> "${CUSTOM_CONFIG_FILE}"
 
-# Remove unused packages from system.
+# Remove unused packages from system, using "apt autoremove".
 # Unattended-Upgrade::Remove-Unused-Kernel-Packages "true";
 Unattended-Upgrade::Remove-Unused-Dependencies "true";
+Unattended-Upgrade::Remove-New-Unused-Dependencies "true";
 
 EOF
   fi
