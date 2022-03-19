@@ -111,22 +111,6 @@ function enable_unattended_repositories {
 
 }
 
-
-function activate_repository {
-  repository=$1
-  disabled=$2
-
-  line="Unattended-Upgrade::Origins-Pattern { \"${repository}\"; }"
-  if [ ! -z ${disabled} ]; then
-    line="# ${line}"
-  fi
-
-  if [[ $(apt-config dump | grep Unattended-Upgrade | grep -v "${line}") ]]; then
-    echo "${line}" >> "${CUSTOM_CONFIG_FILE}"
-  fi
-}
-
-
 function configure_email {
   # Configure email address.
   if [ ! -z "${UNATTENDED_EMAIL_ADDRESS}" ]; then
@@ -198,13 +182,59 @@ function oneshot {
 }
 
 
+# -----------------
+# Utility functions
+# -----------------
+
+function infile {
+  line="$1"
+  file="$2"
+  if ! grep "${line}" ${file} > /dev/null; then
+    return 1
+  fi
+}
+
+function add_comment {
+  comment="$1"
+  add_line "# ${comment}" true
+}
+
+function add_line {
+  line="$1"
+  newline="$2"
+  if ! infile "${line}" ${CUSTOM_CONFIG_FILE}; then
+    if [ ! -z ${newline} ]; then
+      line="\n${line}"
+    fi
+    printf "${line}\n" >> "${CUSTOM_CONFIG_FILE}"
+  fi
+}
+
+function activate_repository {
+  repository="$1"
+  disabled="$2"
+
+  line="Unattended-Upgrade::Origins-Pattern:: \"${repository}\";"
+  if [ ! -z ${disabled} ]; then
+    line="# ${line}"
+  fi
+
+  add_line "${line}"
+}
+
+
+
+# ------------------
+# Program entrypoint
+# ------------------
+
 function main {
   setup_unattended
   enable_unattended
-  enable_unattended_repositories
   configure_email
-  configure_schedule
   configure_reboot
+  enable_unattended_repositories
+  configure_schedule
   oneshot
 }
 
