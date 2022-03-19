@@ -36,7 +36,9 @@
 set +ex
 
 
+# ---------------------
 # Configuration section
+# ---------------------
 
 # Path to configuration file which enables unattended upgrades.
 AUTOUPGRADE_CONFIG_FILE=/etc/apt/apt.conf.d/20auto-upgrades
@@ -49,7 +51,9 @@ COMMUNITY_REPOSITORIES_ENABLED="packages.sury.org deb.nodesource.com download.do
 COMMUNITY_REPOSITORIES_DISABLED="packages.grafana.com repo.mongodb.org packages.gitlab.com download.jitsi.org packages.x2go.org"
 
 
+# ---------------
 # Program section
+# ---------------
 
 function setup_unattended {
 
@@ -60,6 +64,8 @@ function setup_unattended {
   # Activate unattended upgrades.
   echo unattended-upgrades unattended-upgrades/enable_auto_updates boolean true | debconf-set-selections
   dpkg-reconfigure -f noninteractive unattended-upgrades
+
+  add_comment "Debian Unattended Upgrade configuration from https://github.com/cicerops/autopilot"
 
 }
 
@@ -97,14 +103,15 @@ function enable_unattended_repositories {
     activate_repository "site=raspbian.raspberrypi.org"
   fi
 
-  # Enable urgent non-security updates and updates from backports.
+  add_comment "Enable urgent non-security updates and updates from backports."
   activate_repository 'codename=${distro_codename}-updates'
   activate_repository 'archive=${distro_codename}-backports'
 
-  # Enable updates from 3rd party repositories.
+  add_comment "Updates from community repositories (enabled)."
   for repository in ${COMMUNITY_REPOSITORIES_ENABLED}; do
     activate_repository "site=${repository}"
   done
+  add_comment "Updates from community repositories (disabled)."
   for repository in ${COMMUNITY_REPOSITORIES_DISABLED}; do
     activate_repository "site=${repository}" true
   done
@@ -116,7 +123,7 @@ function configure_email {
   if [ ! -z "${UNATTENDED_EMAIL_ADDRESS}" ]; then
     apt-config dump | grep "${UNATTENDED_EMAIL_ADDRESS}"
     if [ $? -gt 0 ]; then
-      printf "\n// Email address for notifying on any actions.\n" >> "${CUSTOM_CONFIG_FILE}"
+      printf "\n# Email address for notifying on any actions.\n" >> "${CUSTOM_CONFIG_FILE}"
       printf "Unattended-Upgrade::Mail \"${UNATTENDED_EMAIL_ADDRESS}\";\n" >> "${CUSTOM_CONFIG_FILE}"
     fi
   fi
@@ -162,13 +169,13 @@ function configure_reboot {
   if [ $? -gt 0 ]; then
     cat << EOF >> "${CUSTOM_CONFIG_FILE}"
 
-// Automatically reboot *WITHOUT CONFIRMATION* if the file `/var/run/reboot-required` is found after the upgrade.
+# Automatically reboot *WITHOUT CONFIRMATION* if the file "/var/run/reboot-required" is found after the upgrade.
 Unattended-Upgrade::Automatic-Reboot "${UNATTENDED_REBOOT_ENABLE:-false}";
 
-// If automatic reboot is enabled and needed, reboot at the specific time.
+# If automatic reboot is enabled and needed, reboot at the specific time.
 Unattended-Upgrade::Automatic-Reboot-Time "${UNATTENDED_REBOOT_TIME:-04:00}";
 
-// When set to "true", automatically reboot even if there are users currently logged in.
+# Do not automatically reboot when there are users currently logged in.
 Unattended-Upgrade::Automatic-Reboot-WithUsers "false";
 
 EOF
