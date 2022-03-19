@@ -36,12 +36,20 @@
 set +ex
 
 
+# Configuration section
+
 # Path to configuration file which enables unattended upgrades.
 AUTOUPGRADE_CONFIG_FILE=/etc/apt/apt.conf.d/20auto-upgrades
 
 # Path to configuration file for custom parameters.
 CUSTOM_CONFIG_FILE=/etc/apt/apt.conf.d/80custom
 
+# Community repositories to enable upgrading packages from.
+COMMUNITY_REPOSITORIES_ENABLED="packages.sury.org deb.nodesource.com download.docker.com packages.icinga.com"
+COMMUNITY_REPOSITORIES_DISABLED="packages.grafana.com repo.mongodb.org packages.gitlab.com download.jitsi.org packages.x2go.org"
+
+
+# Program section
 
 function setup_unattended {
 
@@ -79,6 +87,43 @@ EOF
   sed -i 's|APT::Periodic::Unattended-Upgrade "1";|APT::Periodic::Unattended-Upgrade "always";|g' "${AUTOUPGRADE_CONFIG_FILE}"
   return
 
+}
+
+
+function enable_unattended_repositories {
+
+  # Enable non-vanilla baseline repositories.
+  if [[ $(command -v lsb_release) && $(lsb_release --id --short) == "Raspbian" ]]; then
+    activate_repository "site=raspbian.raspberrypi.org"
+  fi
+
+  # Enable urgent non-security updates and updates from backports.
+  activate_repository 'codename=${distro_codename}-updates'
+  activate_repository 'archive=${distro_codename}-backports'
+
+  # Enable updates from 3rd party repositories.
+  for repository in ${COMMUNITY_REPOSITORIES_ENABLED}; do
+    activate_repository "site=${repository}"
+  done
+  for repository in ${COMMUNITY_REPOSITORIES_DISABLED}; do
+    activate_repository "site=${repository}" true
+  done
+
+}
+
+
+function activate_repository {
+  repository=$1
+  disabled=$2
+
+  line="Unattended-Upgrade::Origins-Pattern { \"${repository}\"; }"
+  if [ ! -z ${disabled} ]; then
+    line="# ${line}"
+  fi
+
+  if [[ $(apt-config dump | grep Unattended-Upgrade | grep -v "${line}") ]]; then
+    echo "${line}" >> "${CUSTOM_CONFIG_FILE}"
+  fi
 }
 
 
@@ -156,6 +201,7 @@ function oneshot {
 function main {
   setup_unattended
   enable_unattended
+  enable_unattended_repositories
   configure_email
   configure_schedule
   configure_reboot
