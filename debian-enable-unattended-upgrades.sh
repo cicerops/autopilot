@@ -200,7 +200,7 @@ EOF
 
 function oneshot {
   # Manually run unattended upgrades once.
-  apt-get update && unattended-upgrade --debug
+  apt-get update && unattended-upgrade --dry-run --debug
 }
 
 
