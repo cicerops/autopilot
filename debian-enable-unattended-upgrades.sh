@@ -211,7 +211,7 @@ function oneshot {
 function infile {
   line="$1"
   file="$2"
-  if ! grep "${line}" ${file} > /dev/null; then
+  if ! grep "${line}" ${file} 2> /dev/null; then
     return 1
   fi
 }
