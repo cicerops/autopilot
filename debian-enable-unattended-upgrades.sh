@@ -73,7 +73,7 @@ function setup_unattended {
 function enable_unattended {
 
   # Enable automatic package upgrades.
-  apt-config dump | grep "APT::Periodic::Unattended-Upgrade"
+  apt-config dump | grep "APT::Periodic::Unattended-Upgrade" > /dev/null 2>&1
   if [ $? -gt 0 ]; then
     cat << EOF >> "${AUTOUPGRADE_CONFIG_FILE}"
 APT::Periodic::Update-Package-Lists "1";
@@ -121,11 +121,11 @@ function enable_unattended_repositories {
 function configure_email {
   # Configure email address.
   if [ ! -z "${UNATTENDED_EMAIL_ADDRESS}" ]; then
-    apt-config dump | grep "${UNATTENDED_EMAIL_ADDRESS}"
-    if [ $? -gt 0 ]; then
-      printf "\n# Email address for notifying on any actions.\n" >> "${CUSTOM_CONFIG_FILE}"
-      printf "Unattended-Upgrade::Mail \"${UNATTENDED_EMAIL_ADDRESS}\";\n" >> "${CUSTOM_CONFIG_FILE}"
+    if infile "${UNATTENDED_EMAIL_ADDRESS}" ${CUSTOM_CONFIG_FILE}; then
+      return
     fi
+    add_comment "Email address for notifying on any actions."
+    printf "Unattended-Upgrade::Mail \"${UNATTENDED_EMAIL_ADDRESS}\";\n" >> "${CUSTOM_CONFIG_FILE}"
   fi
 }
 
@@ -165,9 +165,11 @@ EOF
 
 
 function configure_reboot {
-  apt-config dump | grep "Unattended-Upgrade::Automatic-Reboot"
-  if [ $? -gt 0 ]; then
-    cat << EOF >> "${CUSTOM_CONFIG_FILE}"
+
+  if infile "Unattended-Upgrade::Automatic-Reboot" ${CUSTOM_CONFIG_FILE}; then
+    return
+  fi
+  cat << EOF >> "${CUSTOM_CONFIG_FILE}"
 
 # Automatically reboot *WITHOUT CONFIRMATION* if the file "/var/run/reboot-required" is found after the upgrade.
 Unattended-Upgrade::Automatic-Reboot "${UNATTENDED_REBOOT_ENABLE:-false}";
@@ -179,14 +181,16 @@ Unattended-Upgrade::Automatic-Reboot-Time "${UNATTENDED_REBOOT_TIME:-04:00}";
 Unattended-Upgrade::Automatic-Reboot-WithUsers "false";
 
 EOF
-  fi
 }
 
 
 function configure_cleanup {
-  apt-config dump | grep "Unattended-Upgrade::Remove-Unused"
-  if [ $? -gt 0 ]; then
-    cat << EOF >> "${CUSTOM_CONFIG_FILE}"
+
+  if infile "Unattended-Upgrade::Remove-Unused" ${CUSTOM_CONFIG_FILE}; then
+    return
+  fi
+
+  cat << EOF >> "${CUSTOM_CONFIG_FILE}"
 
 # Remove unused packages from system, using "apt autoremove".
 # Unattended-Upgrade::Remove-Unused-Kernel-Packages "true";
@@ -194,7 +198,6 @@ function configure_cleanup {
 # Unattended-Upgrade::Remove-New-Unused-Dependencies "true";
 
 EOF
-  fi
 }
 
 
@@ -211,7 +214,7 @@ function oneshot {
 function infile {
   line="$1"
   file="$2"
-  if ! grep "${line}" ${file} 2> /dev/null; then
+  if ! grep "${line}" ${file} > /dev/null 2>&1; then
     return 1
   fi
 }
@@ -224,12 +227,14 @@ function add_comment {
 function add_line {
   line="$1"
   newline="$2"
-  if ! infile "${line}" ${CUSTOM_CONFIG_FILE}; then
-    if [ ! -z ${newline} ]; then
-      line="\n${line}"
-    fi
-    printf "${line}\n" >> "${CUSTOM_CONFIG_FILE}"
+  if infile "${line}" ${CUSTOM_CONFIG_FILE}; then
+    return
   fi
+
+  if [ ! -z ${newline} ]; then
+    line="\n${line}"
+  fi
+  printf "${line}\n" >> "${CUSTOM_CONFIG_FILE}"
 }
 
 function activate_repository {
@@ -237,6 +242,9 @@ function activate_repository {
   disabled="$2"
 
   line="Unattended-Upgrade::Origins-Pattern:: \"${repository}\";"
+  if infile "${line}" ${CUSTOM_CONFIG_FILE}; then
+    return
+  fi
   if [ ! -z ${disabled} ]; then
     line="# ${line}"
   fi
