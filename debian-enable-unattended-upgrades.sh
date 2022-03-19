@@ -35,8 +35,11 @@
 #
 set +ex
 
-# File to place custom configuration parameters into.
+
+# Path to configuration file which enables unattended upgrades.
 AUTOUPGRADE_CONFIG_FILE=/etc/apt/apt.conf.d/20auto-upgrades
+
+# Path to configuration file for custom parameters.
 CUSTOM_CONFIG_FILE=/etc/apt/apt.conf.d/80custom
 
 
@@ -53,7 +56,7 @@ function setup_unattended {
 }
 
 
-function configure_unattended {
+function enable_unattended {
 
   # Enable automatic package upgrades.
   apt-config dump | grep "APT::Periodic::Unattended-Upgrade"
@@ -145,13 +148,13 @@ EOF
 
 function oneshot {
   # Manually run unattended upgrades once.
-  apt-get update && unattended-upgrade -d
+  apt-get update && unattended-upgrade --debug
 }
 
 
 function main {
   setup_unattended
-  configure_unattended
+  enable_unattended
   configure_email
   configure_schedule
   configure_reboot
