@@ -262,9 +262,14 @@ function main {
 }
 
 function ready {
+  hostname=$(hostname -f)
   echo
-  echo 'The system has been configured, the output above is from `unattended-upgrade --dry-run --debug`.'
-  echo 'Please run `unattended-upgrade --debug` in order to apply the changes.'
+  echo "The system on \"${hostname}\" has been configured, the output above"
+  echo "is from \`unattended-upgrade --dry-run --debug\`."
+  echo
+  echo "Please run \`ssh root@${hostname} unattended-upgrade --verbose\` in order to apply the changes."
+  echo
+
 }
 
 main
