@@ -42,7 +42,7 @@ set +ex
 AUTOUPGRADE_CONFIG_FILE=/etc/apt/apt.conf.d/20auto-upgrades
 
 # Path to configuration file for custom parameters.
-CUSTOM_CONFIG_FILE=/etc/apt/apt.conf.d/80custom
+CUSTOM_CONFIG_FILE=/etc/apt/apt.conf.d/50unattended-upgrades-custom
 
 # Community repositories to enable upgrading packages from.
 COMMUNITY_REPOSITORIES_ENABLED="packages.sury.org deb.nodesource.com download.docker.com packages.icinga.com packages.icinga.org"
