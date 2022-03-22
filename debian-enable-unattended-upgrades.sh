@@ -47,7 +47,7 @@ AUTOUPGRADE_CONFIG_FILE=/etc/apt/apt.conf.d/20auto-upgrades
 CUSTOM_CONFIG_FILE=/etc/apt/apt.conf.d/50unattended-upgrades-custom
 
 # Community repositories to enable upgrading packages from.
-COMMUNITY_REPOSITORIES_ENABLED="packages.sury.org deb.nodesource.com dl.yarnpkg.com download.docker.com packages.icinga.com packages.icinga.org"
+COMMUNITY_REPOSITORIES_ENABLED="packages.sury.org deb.nodesource.com dl.yarnpkg.com download.docker.com packages.icinga.com packages.icinga.org download.proxmox.com enterprise.proxmox.com"
 COMMUNITY_REPOSITORIES_DISABLED="packages.grafana.com repo.mosquitto.org repo.mongodb.org packages.gitlab.com download.jitsi.org packages.x2go.org"
 
 
