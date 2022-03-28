@@ -101,6 +101,7 @@ function enable_unattended_repositories {
   # Enable non-vanilla baseline repositories.
   if [[ $(command -v lsb_release) && $(lsb_release --id --short) == "Raspbian" ]]; then
     activate_repository "site=raspbian.raspberrypi.org"
+    activate_repository "archive=stable"
   fi
 
   add_comment "Enable urgent non-security updates and updates from backports."
