@@ -50,6 +50,11 @@ CUSTOM_CONFIG_FILE=/etc/apt/apt.conf.d/50unattended-upgrades-custom
 COMMUNITY_REPOSITORIES_ENABLED="packages.sury.org deb.nodesource.com dl.yarnpkg.com download.docker.com packages.icinga.com packages.icinga.org download.proxmox.com enterprise.proxmox.com"
 COMMUNITY_REPOSITORIES_DISABLED="packages.grafana.com repo.mosquitto.org repos.influxdata.com repo.mongodb.org packages.gitlab.com download.jitsi.org packages.x2go.org rspamd.com"
 
+# Set default values for optional configuration settings outlined above.
+UNATTENDED_PACKAGE_TIME=${UNATTENDED_PACKAGE_TIME:-7,16:00}
+UNATTENDED_REBOOT_ENABLE=${UNATTENDED_REBOOT_ENABLE:-false}
+UNATTENDED_REBOOT_TIME=${UNATTENDED_REBOOT_TIME:-04:00}
+
 
 # ---------------
 # Program section
@@ -139,7 +144,7 @@ function configure_schedule {
   cat << EOF > /etc/systemd/system/apt-daily-upgrade.timer.d/override.conf
 [Timer]
 OnCalendar=
-OnCalendar=*-*-* ${UNATTENDED_PACKAGE_TIME:-7,16:00}
+OnCalendar=*-*-* ${UNATTENDED_PACKAGE_TIME}
 RandomizedDelaySec=15m
 EOF
 
@@ -173,10 +178,10 @@ function configure_reboot {
   cat << EOF >> "${CUSTOM_CONFIG_FILE}"
 
 # Automatically reboot *WITHOUT CONFIRMATION* if the file "/var/run/reboot-required" is found after the upgrade.
-Unattended-Upgrade::Automatic-Reboot "${UNATTENDED_REBOOT_ENABLE:-false}";
+Unattended-Upgrade::Automatic-Reboot "${UNATTENDED_REBOOT_ENABLE}";
 
 # If automatic reboot is enabled and needed, reboot at the specific time.
-Unattended-Upgrade::Automatic-Reboot-Time "${UNATTENDED_REBOOT_TIME:-04:00}";
+Unattended-Upgrade::Automatic-Reboot-Time "${UNATTENDED_REBOOT_TIME}";
 
 # Do not automatically reboot when there are users currently logged in.
 Unattended-Upgrade::Automatic-Reboot-WithUsers "false";
