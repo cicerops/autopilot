@@ -12,7 +12,8 @@
 #   # Enable automatic reboots. Default is `false`.
 #   export UNATTENDED_REBOOT_ENABLE=true
 #
-#   # Configure reboot time. Default is `04:00`.
+#   # Configure reboot time.
+#   # Default is `03:00` for hypervisor machines and `04:00` for guest machines.
 #   export UNATTENDED_REBOOT_TIME=22:00
 #
 #   # Configure email notifications. Default is `no emails`.
@@ -53,7 +54,11 @@ COMMUNITY_REPOSITORIES_DISABLED="packages.grafana.com repo.mosquitto.org repos.i
 # Set default values for optional configuration settings outlined above.
 UNATTENDED_PACKAGE_TIME=${UNATTENDED_PACKAGE_TIME:-7,16:00}
 UNATTENDED_REBOOT_ENABLE=${UNATTENDED_REBOOT_ENABLE:-false}
+if is_hypervisor; then
+UNATTENDED_REBOOT_TIME=${UNATTENDED_REBOOT_TIME:-03:00}
+else
 UNATTENDED_REBOOT_TIME=${UNATTENDED_REBOOT_TIME:-04:00}
+fi
 
 
 # ---------------
@@ -258,6 +263,14 @@ function activate_repository {
   add_line "${line}"
 }
 
+function is_empty() {
+  # https://superuser.com/a/1284256
+  test -z $(find "$1" -mindepth 1 -printf X -quit)
+}
+
+function is_hypervisor() {
+  ($(is_empty /proc/xen 2> /dev/null) && $(test ! -e /dev/kvm)) && return 1 || return 0
+}
 
 
 # ------------------
