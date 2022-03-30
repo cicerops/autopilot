@@ -258,6 +258,14 @@ function activate_repository {
   add_line "${line}"
 }
 
+function is_empty() {
+  # https://superuser.com/a/1284256
+  test -z $(find "$1" -mindepth 1 -printf X -quit)
+}
+
+function is_hypervisor() {
+  ($(is_empty /proc/xen 2> /dev/null) && $(test ! -e /dev/kvm)) && return 1 || return 0
+}
 
 
 # ------------------
